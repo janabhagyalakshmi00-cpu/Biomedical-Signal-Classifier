@@ -1,0 +1,21 @@
+{
+  "n_train": 300,
+  "n_test": 100,
+  "n_features": 4,
+  "feature_names": [
+    "rr_mean",
+    "rr_std",
+    "qrs_amp",
+    "t_wave_amp"
+  ],
+  "class_distribution_train": {
+    "normal": 180,
+    "abnormal": 120
+  },
+  "class_distribution_test": {
+    "normal": 60,
+    "abnormal": 40
+  },
+  "synthetic": true,
+  "random_seed": 42
+}

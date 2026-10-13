@@ -1,0 +1,21 @@
+{
+  "name": "Processor_B",
+  "description": "Phase-1 reference Processor B (9 physical qubits)",
+  "physical_qubit_budget": 9,
+  "coupling_map": [
+    [0, 1],
+    [1, 2],
+    [1, 6],
+    [2, 3],
+    [2, 6],
+    [2, 5],
+    [3, 4],
+    [4, 5],
+    [5, 6],
+    [6, 7],
+    [6, 8],
+    [8, 0]
+  ],
+  "source": "QFF 2026 Phase 1 Master Challenge Guide / PS-Q1 reference",
+  "notes": "Participant must not invent additional edges. Indices are 0-based."
+}

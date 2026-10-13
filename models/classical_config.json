@@ -1,0 +1,23 @@
+{
+  "model_type": "LogisticRegression",
+  "class_weight": "balanced",
+  "random_state": 42,
+  "metrics_on_test": {
+    "accuracy": 0.99,
+    "precision_abnormal": 1.0,
+    "recall_abnormal": 0.975,
+    "f1_abnormal": 0.9873417721518988,
+    "n_samples": 100,
+    "n_abnormal": 40
+  },
+  "confusion_matrix": [
+    [
+      60,
+      0
+    ],
+    [
+      1,
+      39
+    ]
+  ]
+}

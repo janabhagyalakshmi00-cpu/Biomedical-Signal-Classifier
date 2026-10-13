@@ -1,0 +1,42 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data that should not be redistributed (if real patient data were present)
+# data/raw/*
+# Keep sample/ and processed/ for reproducibility of synthetic mode
+
+# Secrets
+.env
+*.pem
+credentials.json
+
+# Large temporary
+*.log
+tmp/
+temp/
