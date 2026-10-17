@@ -8,8 +8,6 @@ import time
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.transpiler import CouplingMap
-from qiskit_aer import AerSimulator
-from qiskit_aer.noise import NoiseModel, depolarizing_error, ReadoutError
 
 from .config import NOISE_CONFIG, SHOTS
 from .processors import load_processor, get_coupling_map
@@ -23,8 +21,9 @@ def build_noise_model(
     p1: float = NOISE_CONFIG["single_qubit_depolarizing"],
     p2: float = NOISE_CONFIG["cx_depolarizing"],
     readout: float = NOISE_CONFIG["readout_error"],
-) -> NoiseModel:
-    """Construct a simple depolarizing + readout noise model."""
+):
+    """Construct a simple depolarizing + readout noise model (lazy Aer import)."""
+    from qiskit_aer.noise import NoiseModel, depolarizing_error, ReadoutError
     nm = NoiseModel()
     err1 = depolarizing_error(p1, 1)
     err2 = depolarizing_error(p2, 2)
@@ -56,8 +55,8 @@ def run_ideal_simulation(
     shots: int = SHOTS,
 ) -> Dict[str, int]:
     """Execute on ideal Aer simulator and return counts."""
+    from qiskit_aer import AerSimulator
     sim = AerSimulator(method="statevector")
-    # For statevector we can use shots=None but keep interface uniform
     job = sim.run(circuit, shots=shots)
     result = job.result()
     return dict(result.get_counts())
@@ -65,10 +64,11 @@ def run_ideal_simulation(
 
 def run_noisy_simulation(
     circuit: QuantumCircuit,
-    noise_model: Optional[NoiseModel] = None,
+    noise_model=None,
     shots: int = SHOTS,
 ) -> Dict[str, int]:
     """Execute on noisy Aer simulator."""
+    from qiskit_aer import AerSimulator
     if noise_model is None:
         noise_model = build_noise_model()
     sim = AerSimulator(noise_model=noise_model)

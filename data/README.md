@@ -1,32 +1,46 @@
 # Data Directory
 
-## Synthetic Demonstration Dataset
+## Synthetic Dataset – Phase 1 Master Guide Configuration
 
-This project ships with a **deterministic synthetic dataset** that mimics numerical features commonly extracted from short ECG segments (RR statistics, QRS amplitude, spectral entropy, HRV proxy, etc.).
+The dataset follows the official specification from the **Phase 1 Master Guide (page 5)**:
 
-- **Never** describe these samples as real patient recordings.
-- Labels: 0 = Normal, 1 = Abnormal.
-- Generated with fixed seed 42 for full reproducibility.
-- Approximately 400 samples, ~40 % abnormal class.
+```python
+from sklearn.datasets import make_classification
 
-File location after first run:
+X, y = make_classification(
+    n_samples=200,
+    n_features=4,
+    n_informative=3,
+    n_redundant=0,      # explicit fix (see note below)
+    n_repeated=0,
+    random_state=42
+)
+```
 
-- `sample/synthetic_ecg_features.csv`
+### Important note on `n_redundant`
+
+The Master Guide lists only:
+```
+n_samples=200, n_features=4, n_informative=3, random_state=42
+```
+
+scikit-learn’s **default** `n_redundant=2` makes the call invalid  
+(3 informative + 2 redundant = 5 > 4 features) and raises `ValueError`.
+
+We therefore set `n_redundant=0` (and `n_repeated=0`) explicitly.  
+This assumption is documented in `report.md` and `docs/methodology.md`.
+
+- Labels: 0 = Normal, 1 = Abnormal
+- Generated with fixed seed 42 for full reproducibility
+- Never described as real patient data
+
+### Files produced after first run
+
+- `sample/synthetic_features.csv`
 - `processed/train_test_split.npz`
 - `processed/dataset_meta.json`
 
-## Real Dataset Option (MIT-BIH Arrhythmia Database)
+## Real Dataset Option (future)
 
-The MIT-BIH Arrhythmia Database is publicly available under PhysioNet:
-
-- Source: https://physionet.org/content/mitdb/1.0.0/
-- License: Open Data Commons Attribution License v1.0
-- Typical use: extract 1–2 s windows around annotated beats, map beat annotations to Normal / Abnormal binary labels.
-
-To enable real-data mode one would:
-
-1. Install `wfdb`
-2. Download selected records (e.g. 100, 101, 103, …)
-3. Implement windowing + feature extraction in `src/feature_extraction.py`
-
-The current Phase-1 demonstration deliberately uses synthetic data so that every reviewer can reproduce results without network access or large downloads.
+The MIT-BIH Arrhythmia Database (PhysioNet) can be added later with the `wfdb` library.  
+Phase-1 evaluation uses only the Master-Guide synthetic configuration above.

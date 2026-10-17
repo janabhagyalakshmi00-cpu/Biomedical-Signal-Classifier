@@ -1,11 +1,17 @@
-"""Dataset loading – synthetic ECG-like features (deterministic).
+"""Dataset loading – Phase 1 Master Guide synthetic configuration.
 
-This project uses a synthetic demonstration dataset that mimics typical
-numerical features extracted from short ECG segments.  It is clearly
-labelled as synthetic and must never be described as real patient data.
+Official specification (Master Guide page 5):
+    make_classification(
+        n_samples=200,
+        n_features=4,
+        n_informative=3,
+        random_state=42
+    )
 
-Real MIT-BIH Arrhythmia Database support can be added later with the
-wfdb library; for Phase-1 reproducibility we rely on the synthetic set.
+scikit-learn default n_redundant=2 makes the call invalid
+(3 informative + 2 redundant > 4 features).  We therefore set
+n_redundant=0 (and n_repeated=0) explicitly.  This assumption is
+documented in data/README.md, report.md and docs/methodology.md.
 """
 
 from __future__ import annotations
@@ -15,10 +21,13 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from sklearn.datasets import make_classification
 
 from .config import (
     N_SAMPLES,
     N_FEATURES,
+    N_INFORMATIVE,
+    N_REDUNDANT,
     PROCESSED_DIR,
     SAMPLE_DIR,
     RANDOM_SEED,
@@ -29,53 +38,50 @@ from .utils import set_seed, get_logger
 logger = get_logger(__name__)
 
 FEATURE_NAMES = [
-    "rr_mean",          # mean RR interval (normalized)
-    "rr_std",           # std of RR intervals
-    "qrs_amp",          # QRS amplitude
-    "t_wave_amp",       # T-wave amplitude
-    "spectral_entropy", # spectral entropy of the segment
-    "hrv_rmssd",        # RMSSD heart-rate variability proxy
+    "feat_0",
+    "feat_1",
+    "feat_2",
+    "feat_3",
 ]
 
 
-def generate_synthetic_ecg_features(
+def generate_synthetic_features(
     n_samples: int = N_SAMPLES,
     n_features: int = N_FEATURES,
+    n_informative: int = N_INFORMATIVE,
+    n_redundant: int = N_REDUNDANT,
     seed: int = RANDOM_SEED,
 ) -> Tuple[np.ndarray, np.ndarray, list[str]]:
-    """Generate deterministic synthetic feature matrix and binary labels.
+    """Generate the Master-Guide synthetic dataset with the necessary fix.
 
-    Class 0 = Normal, Class 1 = Abnormal.
-    Features are scaled roughly into [0, π] range later for angle encoding.
+    Returns
+    -------
+    X : ndarray of shape (n_samples, n_features)
+    y : ndarray of shape (n_samples,)  – 0 = Normal, 1 = Abnormal
+    feature_names : list of length n_features
     """
     set_seed(seed)
-    rng = np.random.default_rng(seed)
 
-    # Base features drawn from slightly different distributions per class
-    X = np.zeros((n_samples, n_features), dtype=np.float64)
-    y = np.zeros(n_samples, dtype=np.int64)
-
-    # Roughly balanced but with mild imbalance (~40% abnormal)
-    n_abnormal = int(0.40 * n_samples)
-    y[:n_abnormal] = 1
-    rng.shuffle(y)
-
-    # Base distributions (only first n_features columns are filled)
-    normal_means = [0.85, 0.05, 1.10, 0.35, 0.55, 0.025]
-    normal_stds  = [0.08, 0.02, 0.15, 0.08, 0.10, 0.008]
-    abn_means    = [0.65, 0.18, 0.70, 0.15, 0.85, 0.09]
-    abn_stds     = [0.18, 0.07, 0.25, 0.12, 0.15, 0.04]
-
-    for i in range(n_samples):
-        means = normal_means if y[i] == 0 else abn_means
-        stds  = normal_stds  if y[i] == 0 else abn_stds
-        for j in range(n_features):
-            X[i, j] = rng.normal(means[j], stds[j])
-
-    # Clip extreme outliers
-    X = np.clip(X, 0.0, 2.5)
+    X, y = make_classification(
+        n_samples=n_samples,
+        n_features=n_features,
+        n_informative=n_informative,
+        n_redundant=n_redundant,
+        n_repeated=0,
+        n_classes=2,
+        random_state=seed,
+    )
     names = FEATURE_NAMES[:n_features]
-    return X, y, names
+    logger.info(
+        "make_classification: n_samples=%d, n_features=%d, "
+        "n_informative=%d, n_redundant=%d, seed=%d",
+        n_samples, n_features, n_informative, n_redundant, seed,
+    )
+    return X.astype(np.float64), y.astype(np.int64), names
+
+
+# Keep old name as alias so existing imports continue to work
+generate_synthetic_ecg_features = generate_synthetic_features
 
 
 def load_dataset(
@@ -93,17 +99,17 @@ def load_dataset(
     ensure_dirs()
     if not use_synthetic:
         raise NotImplementedError(
-            "Real MIT-BIH download is not enabled in this demonstration build. "
+            "Real MIT-BIH download is not enabled in this Phase-1 build. "
             "Set use_synthetic=True (default)."
         )
 
-    X, y, names = generate_synthetic_ecg_features(n_samples=n_samples)
+    X, y, names = generate_synthetic_features(n_samples=n_samples)
     df = pd.DataFrame(X, columns=names)
     df["label"] = y
     df["sample_id"] = [f"syn_{i:04d}" for i in range(len(df))]
 
     # Persist raw synthetic data
-    raw_path = SAMPLE_DIR / "synthetic_ecg_features.csv"
+    raw_path = SAMPLE_DIR / "synthetic_features.csv"
     df.to_csv(raw_path, index=False)
     logger.info("Synthetic dataset saved to %s (%d samples)", raw_path, len(df))
     return df, y, names
@@ -140,6 +146,19 @@ def save_processed(
             "abnormal": int((y_test == 1).sum()),
         },
         "synthetic": True,
+        "source": "sklearn.datasets.make_classification",
+        "make_classification_params": {
+            "n_samples": N_SAMPLES,
+            "n_features": N_FEATURES,
+            "n_informative": N_INFORMATIVE,
+            "n_redundant": N_REDUNDANT,
+            "n_repeated": 0,
+            "random_state": RANDOM_SEED,
+        },
+        "note": (
+            "Master Guide specifies n_informative=3 with n_features=4. "
+            "Default n_redundant=2 is invalid; n_redundant=0 is the documented fix."
+        ),
         "random_seed": RANDOM_SEED,
     }
     from .config import save_json

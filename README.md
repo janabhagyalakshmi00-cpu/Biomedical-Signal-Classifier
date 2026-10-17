@@ -10,7 +10,7 @@ Build a hybrid VQC that classifies short ECG/EEG-style signal segments into **No
 
 ## Dataset
 
-- **Synthetic demonstration dataset** (deterministic, seed = 42).
+- **Master Guide synthetic dataset** (`make_classification`, n_samples=200, n_features=4, n_informative=3, n_redundant=0, seed=42).
 - 400 samples, 4 numerical features inspired by ECG descriptors (RR mean/std, QRS amplitude, T-wave amplitude).
 - Labels: 0 = Normal, 1 = Abnormal (~40 % abnormal).
 - **Never described as real patient data.**
@@ -88,8 +88,8 @@ PS-Q1-Biomedical-Signal-Classifier/
 
 | Model                  | Accuracy | Precision (Abn) | Recall (Abn) | F1 (Abn) |
 |------------------------|----------|-----------------|--------------|----------|
-| Logistic Regression    | 0.990    | 1.000           | **0.975**    | 0.987    |
-| VQC (ideal)            | 0.730    | 0.710           | **0.550**    | 0.620    |
+| Logistic Regression    | 0.900    | 0.917           | **0.880**    | 0.898    |
+| VQC (ideal)            | 0.700    | 0.679           | **0.760**    | 0.717    |
 
 | Processor | Physical budget | Depth | CX | SWAP |
 |-----------|-----------------|-------|----|------|

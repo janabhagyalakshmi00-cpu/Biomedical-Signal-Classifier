@@ -1,14 +1,14 @@
 {
   "random_seed": 42,
-  "n_samples": 400,
+  "n_samples": 200,
   "n_features": 4,
   "n_qubits": 4,
   "max_iter": 40,
   "feature_names": [
-    "rr_mean",
-    "rr_std",
-    "qrs_amp",
-    "t_wave_amp"
+    "feat_0",
+    "feat_1",
+    "feat_2",
+    "feat_3"
   ],
   "synthetic": true,
   "primary_metric": "recall_abnormal"

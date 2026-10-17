@@ -9,11 +9,15 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # Random seed for reproducibility
 RANDOM_SEED = 42
 
-# Data settings
-N_SAMPLES = 400  # Approximate total samples (200-500 range)
-N_FEATURES = 4   # 4-8 numerical features (chosen so logical circuit fits Processor A budget of 5)
+# Data settings — Phase 1 Master Guide (page 5) configuration
+# Official call: make_classification(n_samples=200, n_features=4, n_informative=3, random_state=42)
+# Default n_redundant=2 causes ValueError (3+2 > 4). Explicit n_redundant=0 is the required fix.
+N_SAMPLES = 200
+N_FEATURES = 4
+N_INFORMATIVE = 3
+N_REDUNDANT = 0          # explicit correction of Master Guide default conflict
 TEST_SIZE = 0.25
-N_QUBITS = 4     # Matches feature count for angle encoding; fits both Processor A (5) and B (9)
+N_QUBITS = 4             # matches feature count; fits Processor A (5) and B (9)
 
 # Paths
 DATA_DIR = PROJECT_ROOT / "data"

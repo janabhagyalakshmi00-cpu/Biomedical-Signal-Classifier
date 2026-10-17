@@ -6,7 +6,13 @@ We implement a hybrid quantum-classical Variational Quantum Classifier (VQC) for
 
 ## Data
 
-A deterministic synthetic feature matrix (seed = 42) with 6 clinically-motivated numerical descriptors is generated. Features are scaled to the interval [0, π] using a MinMaxScaler fitted exclusively on the training set, making them suitable for angle encoding.
+The dataset follows the Phase 1 Master Guide (page 5) configuration:
+
+    make_classification(n_samples=200, n_features=4, n_informative=3,
+                        n_redundant=0, n_repeated=0, random_state=42)
+
+(`n_redundant=0` is required because the default value 2 makes the call invalid.)
+Features are scaled to the interval [0, π] using a MinMaxScaler fitted exclusively on the training set, making them suitable for angle encoding.
 
 ## Classical Baseline
 

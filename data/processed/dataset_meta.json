@@ -1,21 +1,31 @@
 {
-  "n_train": 300,
-  "n_test": 100,
+  "n_train": 150,
+  "n_test": 50,
   "n_features": 4,
   "feature_names": [
-    "rr_mean",
-    "rr_std",
-    "qrs_amp",
-    "t_wave_amp"
+    "feat_0",
+    "feat_1",
+    "feat_2",
+    "feat_3"
   ],
   "class_distribution_train": {
-    "normal": 180,
-    "abnormal": 120
+    "normal": 75,
+    "abnormal": 75
   },
   "class_distribution_test": {
-    "normal": 60,
-    "abnormal": 40
+    "normal": 25,
+    "abnormal": 25
   },
   "synthetic": true,
+  "source": "sklearn.datasets.make_classification",
+  "make_classification_params": {
+    "n_samples": 200,
+    "n_features": 4,
+    "n_informative": 3,
+    "n_redundant": 0,
+    "n_repeated": 0,
+    "random_state": 42
+  },
+  "note": "Master Guide specifies n_informative=3 with n_features=4. Default n_redundant=2 is invalid; n_redundant=0 is the documented fix.",
   "random_seed": 42
 }
